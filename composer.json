@@ -1,0 +1,28 @@
+{
+    "name": "delboy1978uk/dev-tools",
+    "description": "Testing and quality tools",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Derek McLean",
+            "email": "delboy1978uk@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "codeception/codeception":"^5.1",
+        "codeception/module-asserts": "^3.0",
+        "codeception/module-doctrine2": "^3.0",
+        "codeception/module-phpbrowser": "^3.0.0",
+        "codeception/module-rest": "^3.3",
+        "codeception/module-webdriver": "^3.2.1",
+        "phpro/grumphp": "^v2.5",
+        "phpstan/phpstan": "^1.10"
+    },
+    "require-dev":{},
+    "autoload":{
+        "psr-4":{
+            "Bone\\DevTools\\":"src/"
+        }
+    }
+}
