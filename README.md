@@ -1,5 +1,15 @@
 # dev-tools
-[![Build Status](https://travis-ci.org/delboy1978uk/blank.png?branch=master)](https://travis-ci.org/delboy1978uk/blank) [![Code Coverage](https://scrutinizer-ci.com/g/delboy1978uk/blank/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/delboy1978uk/blank/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/delboy1978uk/blank/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/delboy1978uk/blank/?branch=master) <br />
-
+Codeception, GrumPHP, PHPStan, and dev utilities, in one easy package
 ## installation
+```
+composer require --dev delby1089uk/dev-tools
+```
 ## usage
+Use Codeception and PHPStan as normal.
+### ReflectionInvoker
+Use the trait wherever you need to use reflection
+### bin/jirahook
+This will take a branch in this format `feature/ABC-1234/whatever` and will auto start your commit message with
+```
+ABC-1234 : 
+```
