@@ -17,12 +17,13 @@
         "codeception/module-rest": "^3.3",
         "codeception/module-webdriver": "^3.2.1",
         "phpro/grumphp": "^v2.5",
-        "phpstan/phpstan": "^1.10"
+        "phpstan/phpstan": "^1.10",
+        "league/openapi-psr7-validator": "^0.22.0"
     },
-    "require-dev":{},
     "autoload":{
         "psr-4":{
-            "Bone\\DevTools\\":"src/"
+            "Bone\\DevTools\\":"src/",
+            "Codeception\\Module\\":"src/Module"
         }
     },
     "config": {
