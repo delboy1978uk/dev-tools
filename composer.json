@@ -22,8 +22,8 @@
     },
     "autoload":{
         "psr-4":{
-            "Bone\\DevTools\\":"src/",
-            "Codeception\\Module\\":"src/Module"
+            "Bone\\DevTools\\":"src/Bone/DevTools",
+            "Codeception\\Module\\":"src/Codeception/Module"
         }
     },
     "config": {
