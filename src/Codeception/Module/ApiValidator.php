@@ -11,10 +11,12 @@ use cebe\openapi\Reader;
 use cebe\openapi\ReferenceContext;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Schema;
+use cebe\openapi\SpecObjectInterface;
 use Codeception\Lib\ModuleContainer;
 use Codeception\Module;
 use Exception;
 use League\OpenAPIValidation\PSR7\OperationAddress;
+use League\OpenAPIValidation\PSR7\ResponseValidator;
 use League\OpenAPIValidation\PSR7\ValidatorBuilder;
 use League\OpenAPIValidation\Schema\SchemaValidator;
 use function file_exists;
@@ -23,9 +25,7 @@ use function strpos;
 
 class ApiValidator extends Module
 {
-    private ?OpenApi $spec = null;
-    private string $type;
-    private string $contents;
+    private ?SpecObjectInterface $spec = null;
 
     public function __construct(protected ModuleContainer $moduleContainer, ?array $config = null)
     {
@@ -40,26 +40,29 @@ class ApiValidator extends Module
         }
 
         if (file_exists($specFile)) {
-            $this->contents = file_get_contents($specFile);
-            $this->type = strpos($specFile, '.json') !== false ? 'json' : 'yaml';
+            $contents = file_get_contents($specFile);
+            $type = strpos($specFile, '.json') !== false ? 'json' : 'yaml';
         }
+
+        $this->spec = $type === 'json'
+            ? Reader::readFromJson($contents)
+            : Reader::readFromYaml($contents);
+
+        if (!$this->spec) {
+            $this->fail('No valid api doc yaml or json was provided');
+        }
+
+        $this->validator = (new ValidatorBuilder)->fromSchema($this->spec)->getResponseValidator();
+
     }
 
-    public function seeValidApiSpec(string $method, string $route, string $responseBody, int $status = 200): void
+    public function seeValidApiSpec(string $method, string $route, array $responseBody, int $status = 200): void
     {
-        if (!$this->contents) {
-            $this->fail('No valid api doc was specified');
-        }
-
         try {
-            $this->spec = $this->type === 'json'
-                ? Reader::readFromJson($this->contents)
-                : Reader::readFromYaml($this->contents);
-            $validator = (new ValidatorBuilder)->fromSchema($this->spec)->getResponseValidator();
             $operation = new OperationAddress($route, $method);
             $response = new JsonResponse($responseBody, $status);
-            $validator->validate($operation, $response);
-            $this->assertNotTrue(false);
+            $this->validator->validate($operation, $response);
+            $this->assertTrue(true);
         } catch (Exception $e) {
             $this->fail($e->getMessage());
         }
