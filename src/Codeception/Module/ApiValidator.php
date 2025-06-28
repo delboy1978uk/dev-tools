@@ -15,12 +15,16 @@ use cebe\openapi\SpecObjectInterface;
 use Codeception\Lib\ModuleContainer;
 use Codeception\Module;
 use Exception;
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\ResponseFactory;
+use Laminas\Diactoros\Stream;
 use League\OpenAPIValidation\PSR7\OperationAddress;
 use League\OpenAPIValidation\PSR7\ResponseValidator;
 use League\OpenAPIValidation\PSR7\ValidatorBuilder;
 use League\OpenAPIValidation\Schema\SchemaValidator;
 use function file_exists;
 use function file_get_contents;
+use function json_decode;
 use function strpos;
 
 class ApiValidator extends Module
@@ -40,27 +44,20 @@ class ApiValidator extends Module
         }
 
         if (file_exists($specFile)) {
-            $contents = file_get_contents($specFile);
             $type = strpos($specFile, '.json') !== false ? 'json' : 'yaml';
         }
 
-        $this->spec = $type === 'json'
-            ? Reader::readFromJson($contents)
-            : Reader::readFromYaml($contents);
-
-        if (!$this->spec) {
-            $this->fail('No valid api doc yaml or json was provided');
-        }
-
-        $this->validator = (new ValidatorBuilder)->fromSchema($this->spec)->getResponseValidator();
-
+        $this->validator = $type === 'json'
+            ? (new ValidatorBuilder)->fromJsonFile($specFile)->getResponseValidator()
+            : (new ValidatorBuilder)->fromYamlFile($specFile)->getResponseValidator();
     }
 
-    public function seeValidApiSpec(string $method, string $route, array $responseBody, int $status = 200): void
+    public function seeValidApiSpec(string $method, string $route, string $responseBody, int $status = 200): void
     {
         try {
+            $body = json_decode($responseBody, true);
             $operation = new OperationAddress($route, $method);
-            $response = new JsonResponse($responseBody, $status);
+            $response = new JsonResponse($body, $status);
             $this->validator->validate($operation, $response);
             $this->assertTrue(true);
         } catch (Exception $e) {
